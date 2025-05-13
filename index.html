@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>My Essentials Capsule</title>
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+</head>
+<body class="bg-pink-50 font-sans text-gray-800">
+  <div class="max-w-3xl mx-auto p-6">
+    <h1 class="text-3xl font-bold text-center text-pink-600 mb-4">Customize Your Essentials Capsule</h1>
+
+    <form id="capsuleForm" class="bg-white p-6 rounded-2xl shadow-md space-y-4">
+      <div>
+        <label class="block font-semibold mb-2">Choose your capsule color:</label>
+        <div id="colorButtons" class="flex flex-wrap gap-2">
+          <button type="button" class="color-btn bg-pink-300 w-8 h-8 rounded-full" data-color="Blush Pink"></button>
+          <button type="button" class="color-btn bg-blue-300 w-8 h-8 rounded-full" data-color="Sky Blue"></button>
+          <button type="button" class="color-btn bg-purple-300 w-8 h-8 rounded-full" data-color="Lavender"></button>
+          <button type="button" class="color-btn bg-green-300 w-8 h-8 rounded-full" data-color="Mint Green"></button>
+          <button type="button" class="color-btn bg-black w-8 h-8 rounded-full" data-color="Matte Black"></button>
+        </div>
+        <input type="hidden" id="color" value="Blush Pink">
+      </div>
+
+      <div>
+        <label class="block font-semibold">Your name:</label>
+        <input type="text" id="name" class="w-full border rounded p-2">
+      </div>
+
+      <div>
+        <label class="block font-semibold">Emergency contact:</label>
+        <input type="text" id="contact" class="w-full border rounded p-2">
+      </div>
+
+      <div>
+        <label class="block font-semibold">Medications (name + dosage):</label>
+        <textarea id="meds" class="w-full border rounded p-2"></textarea>
+      </div>
+
+      <div>
+        <label class="block font-semibold">Allergies:</label>
+        <input type="text" id="allergies" class="w-full border rounded p-2">
+      </div>
+
+      <div>
+        <label class="block font-semibold">Medical conditions:</label>
+        <input type="text" id="conditions" class="w-full border rounded p-2">
+      </div>
+
+      <div>
+        <label class="block font-semibold">Notes for responders:</label>
+        <textarea id="notes" class="w-full border rounded p-2"></textarea>
+      </div>
+
+      <button type="button" onclick="generateCard()" class="bg-pink-500 text-white px-4 py-2 rounded-xl hover:bg-pink-600">Generate QR + Card</button>
+    </form>
+
+    <div id="cardPreview" class="mt-6 hidden">
+      <h2 class="text-xl font-bold mb-2 text-pink-600">Your Printable Info Card</h2>
+      <div id="card" class="bg-white border rounded-lg p-4 shadow-md space-y-2">
+        <p><strong>Name:</strong> <span id="cardName"></span></p>
+        <p><strong>Emergency Contact:</strong> <span id="cardContact"></span></p>
+        <p><strong>Medications:</strong> <span id="cardMeds"></span></p>
+        <p><strong>Allergies:</strong> <span id="cardAllergies"></span></p>
+        <p><strong>Conditions:</strong> <span id="cardConditions"></span></p>
+        <p><strong>Notes:</strong> <span id="cardNotes"></span></p>
+        <div id="qrcode" class="mt-4"></div>
+      </div>
+      <button onclick="downloadCard()" class="mt-4 bg-green-500 text-white px-4 py-2 rounded-xl hover:bg-green-600">Download Card</button>
+    </div>
+  </div>
+
+  <script>
+    document.querySelectorAll('.color-btn').forEach(button => {
+      button.addEventListener('click', () => {
+        document.getElementById('color').value = button.getAttribute('data-color');
+        document.querySelectorAll('.color-btn').forEach(btn => btn.classList.remove('ring-4', 'ring-pink-400'));
+        button.classList.add('ring-4', 'ring-pink-400');
+      });
+    });
+
+    function generateCard() {
+      const name = document.getElementById('name').value;
+      const contact = document.getElementById('contact').value;
+      const meds = document.getElementById('meds').value;
+      const allergies = document.getElementById('allergies').value;
+      const conditions = document.getElementById('conditions').value;
+      const notes = document.getElementById('notes').value;
+
+      document.getElementById('cardName').textContent = name;
+      document.getElementById('cardContact').textContent = contact;
+      document.getElementById('cardMeds').textContent = meds;
+      document.getElementById('cardAllergies').textContent = allergies;
+      document.getElementById('cardConditions').textContent = conditions;
+      document.getElementById('cardNotes').textContent = notes;
+
+      const data = `Name: ${name}\nContact: ${contact}\nMeds: ${meds}\nAllergies: ${allergies}\nConditions: ${conditions}\nNotes: ${notes}`;
+
+      document.getElementById('qrcode').innerHTML = '';
+      new QRCode(document.getElementById('qrcode'), {
+        text: data,
+        width: 100,
+        height: 100
+      });
+
+      document.getElementById('cardPreview').classList.remove('hidden');
+    }
+
+    function downloadCard() {
+      const card = document.getElementById("card");
+      html2pdf().from(card).save("MyEssentialsCard.pdf");
+    }
+  </script>
+</body>
+</html>
